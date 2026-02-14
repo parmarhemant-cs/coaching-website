@@ -105,22 +105,29 @@ const scriptURL ="https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4
 const API_KEY = "MY_SECRET_123";
 
 function sendData(data, messageElement, formElement) {
+
+  const formData = new URLSearchParams();
+
+  for (let key in data) {
+    formData.append(key, data[key]);
+  }
+
   fetch(scriptURL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
+    body: formData
   })
   .then(response => response.text())
   .then(result => {
     messageElement.innerText = result;
-    formElement.reset();
+    if (result === "Success") {
+      formElement.reset();
+    }
   })
-  .catch(error => {
+  .catch(() => {
     messageElement.innerText = "Server connection error.";
   });
 }
+
 
 
 document.getElementById("registrationForm")
