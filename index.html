@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Achievers Academy</title>
+
+<style>
+body { font-family: Arial; margin: 0; background: #f4f6f9; }
+header { background:#002147; color:white; padding:20px; text-align:center; }
+section { padding:40px; max-width:900px; margin:auto; }
+.card {
+  background:white; padding:20px; margin-bottom:20px;
+  border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+input, select, textarea {
+  width:100%; padding:10px; margin:8px 0 15px;
+  border-radius:5px; border:1px solid #ccc;
+}
+button {
+  background:#002147; color:white; padding:10px;
+  border:none; border-radius:5px; cursor:pointer;
+}
+button:hover { background:#004080; }
+.message { font-weight:bold; margin-top:10px; }
+.testimonial { background:#e9f1ff; padding:10px; margin:10px 0; }
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Achievers Academy</h1>
+<p>NEET & JEE Coaching Excellence</p>
+</header>
+
+<section>
+
+<div class="card">
+<h2>About Us</h2>
+<p>Expert IITian & Doctor faculty, weekly tests, personal mentoring and result-oriented strategy.</p>
+</div>
+
+<div class="card">
+<h2>Top Results</h2>
+<ul>
+<li>AIR 145 - JEE Advanced 2025</li>
+<li>NEET Score 690+ (12 Students)</li>
+<li>95% students cleared JEE Main</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Student Testimonials</h2>
+<div class="testimonial">"Best coaching experience!" - Rahul</div>
+<div class="testimonial">"Improved my rank dramatically." - Priya</div>
+</div>
+
+<div class="card">
+<h2>Student Registration</h2>
+<form id="registrationForm">
+<input type="text" id="r_name" placeholder="Full Name" required>
+<input type="email" id="r_email" placeholder="Email" required>
+<input type="tel" id="r_phone" placeholder="Phone" required>
+<select id="r_course" required>
+<option value="">Select Course</option>
+<option>NEET</option>
+<option>JEE</option>
+</select>
+<button type="submit">Register</button>
+<div class="message" id="regMsg"></div>
+</form>
+</div>
+
+<div class="card">
+<h2>Enquiry Form</h2>
+<form id="enquiryForm">
+<input type="text" id="e_name" placeholder="Your Name" required>
+<input type="email" id="e_email" placeholder="Your Email" required>
+<textarea id="e_message" placeholder="Your Message" required></textarea>
+<button type="submit">Send Enquiry</button>
+<div class="message" id="enqMsg"></div>
+</form>
+</div>
+
+</section>
+
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
+
+function sendData(data, messageElement, formElement) {
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(result => {
+    if (result === "Success") {
+      messageElement.innerText = "Submitted successfully!";
+      formElement.reset();
+    } else {
+      messageElement.innerText = "Error: " + result;
+    }
+  })
+  .catch(() => {
+    messageElement.innerText = "Server connection error.";
+  });
+}
+
+document.getElementById("registrationForm")
+.addEventListener("submit", function(e){
+  e.preventDefault();
+  sendData({
+    type: "registration",
+    name: r_name.value,
+    email: r_email.value,
+    phone: r_phone.value,
+    course: r_course.value
+  }, regMsg, this);
+});
+
+document.getElementById("enquiryForm")
+.addEventListener("submit", function(e){
+  e.preventDefault();
+  sendData({
+    type: "enquiry",
+    name: e_name.value,
+    email: e_email.value,
+    message: e_message.value
+  }, enqMsg, this);
+});
+</script>
+
+</body>
+</html>
+
