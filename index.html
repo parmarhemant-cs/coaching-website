@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+v<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -107,17 +107,21 @@ const API_KEY = "MY_SECRET_123";
 function sendData(data, messageElement, formElement) {
   fetch(scriptURL, {
     method: "POST",
-    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(data)
   })
-  .then(() => {
-    messageElement.innerText = "Submitted successfully!";
+  .then(response => response.text())
+  .then(result => {
+    messageElement.innerText = result;
     formElement.reset();
   })
-  .catch(() => {
+  .catch(error => {
     messageElement.innerText = "Server connection error.";
   });
 }
+
 
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
