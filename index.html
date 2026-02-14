@@ -6,24 +6,39 @@
 <title>Achievers Academy</title>
 
 <style>
-body { font-family: Arial; margin: 0; background: #f4f6f9; }
+body { font-family: Arial; margin:0; background:#f4f6f9; }
 header { background:#002147; color:white; padding:20px; text-align:center; }
 section { padding:40px; max-width:900px; margin:auto; }
 .card {
-  background:white; padding:20px; margin-bottom:20px;
-  border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  background:white;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 input, select, textarea {
-  width:100%; padding:10px; margin:8px 0 15px;
-  border-radius:5px; border:1px solid #ccc;
+  width:100%;
+  padding:10px;
+  margin:8px 0 15px;
+  border-radius:5px;
+  border:1px solid #ccc;
 }
 button {
-  background:#002147; color:white; padding:10px;
-  border:none; border-radius:5px; cursor:pointer;
+  background:#002147;
+  color:white;
+  padding:10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
 }
 button:hover { background:#004080; }
 .message { font-weight:bold; margin-top:10px; }
-.testimonial { background:#e9f1ff; padding:10px; margin:10px 0; }
+.testimonial {
+  background:#e9f1ff;
+  padding:10px;
+  margin:10px 0;
+  border-radius:5px;
+}
 </style>
 </head>
 
@@ -44,14 +59,14 @@ button:hover { background:#004080; }
 <div class="card">
 <h2>Top Results</h2>
 <ul>
-<li>AIR 145 - JEE Advanced 2025</li>
-<li>NEET Score 690+ (12 Students)</li>
+<li>AIR 145 - JEE Advanced</li>
+<li>12 Students scored 690+ in NEET</li>
 <li>95% students cleared JEE Main</li>
 </ul>
 </div>
 
 <div class="card">
-<h2>Student Testimonials</h2>
+<h2>Testimonials</h2>
 <div class="testimonial">"Best coaching experience!" - Rahul</div>
 <div class="testimonial">"Improved my rank dramatically." - Priya</div>
 </div>
@@ -61,7 +76,7 @@ button:hover { background:#004080; }
 <form id="registrationForm">
 <input type="text" id="r_name" placeholder="Full Name" required>
 <input type="email" id="r_email" placeholder="Email" required>
-<input type="tel" id="r_phone" placeholder="Phone" required>
+<input type="tel" id="r_phone" placeholder="Phone (10-15 digits)" required>
 <select id="r_course" required>
 <option value="">Select Course</option>
 <option>NEET</option>
@@ -87,20 +102,17 @@ button:hover { background:#004080; }
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
+const API_KEY = "MY_SECRET_123";
 
 function sendData(data, messageElement, formElement) {
   fetch(scriptURL, {
     method: "POST",
+    mode: "no-cors",
     body: JSON.stringify(data)
   })
-  .then(res => res.text())
-  .then(result => {
-    if (result === "Success") {
-      messageElement.innerText = "Submitted successfully!";
-      formElement.reset();
-    } else {
-      messageElement.innerText = "Error: " + result;
-    }
+  .then(() => {
+    messageElement.innerText = "Submitted successfully!";
+    formElement.reset();
   })
   .catch(() => {
     messageElement.innerText = "Server connection error.";
@@ -110,7 +122,15 @@ function sendData(data, messageElement, formElement) {
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
   e.preventDefault();
+
+  const phonePattern = /^\+?\d{10,15}$/;
+  if (!phonePattern.test(r_phone.value)) {
+    regMsg.innerText = "Invalid phone number.";
+    return;
+  }
+
   sendData({
+    apiKey: API_KEY,
     type: "registration",
     name: r_name.value,
     email: r_email.value,
@@ -122,7 +142,9 @@ document.getElementById("registrationForm")
 document.getElementById("enquiryForm")
 .addEventListener("submit", function(e){
   e.preventDefault();
+
   sendData({
+    apiKey: API_KEY,
     type: "enquiry",
     name: e_name.value,
     email: e_email.value,
