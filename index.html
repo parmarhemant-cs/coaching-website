@@ -9,6 +9,7 @@
 body { font-family: Arial; margin:0; background:#f4f6f9; }
 header { background:#002147; color:white; padding:20px; text-align:center; }
 section { padding:40px; max-width:900px; margin:auto; }
+
 .card {
   background:white;
   padding:20px;
@@ -16,6 +17,7 @@ section { padding:40px; max-width:900px; margin:auto; }
   border-radius:8px;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
+
 input, select, textarea {
   width:100%;
   padding:10px;
@@ -23,6 +25,7 @@ input, select, textarea {
   border-radius:5px;
   border:1px solid #ccc;
 }
+
 button {
   background:#002147;
   color:white;
@@ -30,16 +33,16 @@ button {
   border:none;
   border-radius:5px;
   cursor:pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
+
 button:hover { background:#004080; }
-button:disabled {
-  background:#777;
-  cursor:not-allowed;
-}
+button:disabled { background:#777; }
+
 .message { font-weight:bold; margin-top:10px; }
+
 .testimonial {
   background:#e9f1ff;
   padding:10px;
@@ -49,18 +52,24 @@ button:disabled {
 
 /* Spinner */
 .spinner {
-  display: none;
-  width: 18px;
-  height: 18px;
-  border: 3px solid #ccc;
-  border-top: 3px solid #ffffff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-left: 10px;
+  display:none;
+  width:18px;
+  height:18px;
+  border:3px solid #ccc;
+  border-top:3px solid #ffffff;
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  margin-left:10px;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to { transform:rotate(360deg); }
+}
+
+.admin-box {
+  background:#fff3cd;
+  padding:15px;
+  border-radius:5px;
 }
 </style>
 </head>
@@ -94,12 +103,14 @@ button:disabled {
 <div class="testimonial">"Improved my rank dramatically." - Priya</div>
 </div>
 
+<!-- ================= REGISTRATION ================= -->
 <div class="card">
 <h2>Student Registration</h2>
 <form id="registrationForm">
 <input type="text" id="r_name" placeholder="Full Name" required>
 <input type="email" id="r_email" placeholder="Email" required>
 <input type="tel" id="r_phone" placeholder="Phone (10-15 digits)" required>
+
 <select id="r_course" required>
 <option value="">Select Course</option>
 <option>NEET</option>
@@ -107,14 +118,15 @@ button:disabled {
 </select>
 
 <button type="submit" id="regBtn">
-  Register
-  <span class="spinner" id="regSpinner"></span>
+Register
+<span class="spinner" id="regSpinner"></span>
 </button>
 
 <div class="message" id="regMsg"></div>
 </form>
 </div>
 
+<!-- ================= ENQUIRY ================= -->
 <div class="card">
 <h2>Enquiry Form</h2>
 <form id="enquiryForm">
@@ -123,84 +135,104 @@ button:disabled {
 <textarea id="e_message" placeholder="Your Message" required></textarea>
 
 <button type="submit" id="enqBtn">
-  Send Enquiry
-  <span class="spinner" id="enqSpinner"></span>
+Send Enquiry
+<span class="spinner" id="enqSpinner"></span>
 </button>
 
 <div class="message" id="enqMsg"></div>
 </form>
 </div>
 
+<!-- ================= ADMIN DASHBOARD ================= -->
+<div class="card admin-box">
+<h2>Admin Dashboard</h2>
+<p>
+📊 View Registrations & Enquiries in your Google Sheet  
+<br><br>
+<a href="https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec" target="_blank">
+Open Google Sheet
+</a>
+</p>
+</div>
+
 </section>
 
 <script>
-const scriptURL ="https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
+const scriptURL = "PASTE_YOUR_NEW_DEPLOYED_WEBAPP_URL_HERE";
 const API_KEY = "MY_SECRET_123";
 
+/* ================= SEND DATA FUNCTION ================= */
 function sendData(data, messageElement, formElement, button, spinner) {
 
-  button.disabled = true;
-  spinner.style.display = "inline-block";
-  messageElement.innerText = "Submitting...";
+button.disabled = true;
+spinner.style.display = "inline-block";
+messageElement.innerText = "Submitting...";
 
-  const formData = new URLSearchParams();
-  for (let key in data) {
-    formData.append(key, data[key]);
-  }
+fetch(scriptURL, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify(data)
+})
+.then(res => res.text())
+.then(result => {
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: formData
-  })
-  .then(response => response.text())
-  .then(result => {
-    messageElement.innerText = result;
-    if (result === "Success") {
-      formElement.reset();
-    }
-  })
-  .catch(() => {
-    messageElement.innerText = "Server connection error.";
-  })
-  .finally(() => {
-    button.disabled = false;
-    spinner.style.display = "none";
-  });
+if(result === "Success"){
+messageElement.innerText = "✅ Submitted Successfully!";
+formElement.reset();
+
+/* WhatsApp Alert */
+window.open(
+"https://wa.me/91YOURNUMBER?text=New%20form%20submission%20received",
+"_blank"
+);
+
+}else{
+messageElement.innerText = result;
 }
 
-/* Registration Form */
+})
+.catch(() => {
+messageElement.innerText = "❌ Server connection error.";
+})
+.finally(() => {
+button.disabled = false;
+spinner.style.display = "none";
+});
+}
+
+/* ================= REGISTRATION ================= */
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
-  e.preventDefault();
+e.preventDefault();
 
-  const phonePattern = /^\+?\d{10,15}$/;
-  if (!phonePattern.test(r_phone.value)) {
-    regMsg.innerText = "Invalid phone number.";
-    return;
-  }
+const phonePattern = /^\+?\d{10,15}$/;
+if (!phonePattern.test(r_phone.value)) {
+regMsg.innerText = "Invalid phone number.";
+return;
+}
 
-  sendData({
-    apiKey: API_KEY,
-    type: "registration",
-    name: r_name.value,
-    email: r_email.value,
-    phone: r_phone.value,
-    course: r_course.value
-  }, regMsg, this, regBtn, regSpinner);
+sendData({
+apiKey: API_KEY,
+type: "registration",
+name: r_name.value,
+email: r_email.value,
+phone: r_phone.value,
+course: r_course.value
+}, regMsg, this, regBtn, regSpinner);
 });
 
-/* Enquiry Form */
+/* ================= ENQUIRY ================= */
 document.getElementById("enquiryForm")
 .addEventListener("submit", function(e){
-  e.preventDefault();
+e.preventDefault();
 
-  sendData({
-    apiKey: API_KEY,
-    type: "enquiry",
-    name: e_name.value,
-    email: e_email.value,
-    message: e_message.value
-  }, enqMsg, this, enqBtn, enqSpinner);
+sendData({
+apiKey: API_KEY,
+type: "enquiry",
+name: e_name.value,
+email: e_email.value,
+message: e_message.value
+}, enqMsg, this, enqBtn, enqSpinner);
 });
 </script>
 
