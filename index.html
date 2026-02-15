@@ -162,43 +162,41 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR
 const API_KEY = "MY_SECRET_123";
 
 /* ================= SEND DATA FUNCTION ================= */
+
 function sendData(data, messageElement, formElement, button, spinner) {
 
-button.disabled = true;
-spinner.style.display = "inline-block";
-messageElement.innerText = "Submitting...";
+  button.disabled = true;
+  spinner.style.display = "inline-block";
+  messageElement.innerText = "Submitting...";
 
-fetch(scriptURL, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify(data)
-})
-.then(res => res.text())
-.then(result => {
+  const formData = new URLSearchParams();
 
-if(result === "Success"){
-messageElement.innerText = "✅ Submitted Successfully!";
-formElement.reset();
+  for (let key in data) {
+    formData.append(key, data[key]);
+  }
 
-/* WhatsApp Alert */
-window.open(
-"https://wa.me/91YOURNUMBER?text=New%20form%20submission%20received",
-"_blank"
-);
+  fetch(scriptURL, {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.text())
+  .then(result => {
+    messageElement.innerText = result;
 
-}else{
-messageElement.innerText = result;
+    if (result === "Success") {
+      formElement.reset();
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    messageElement.innerText = "Server connection error.";
+  })
+  .finally(() => {
+    button.disabled = false;
+    spinner.style.display = "none";
+  });
 }
 
-})
-.catch(() => {
-messageElement.innerText = "❌ Server connection error.";
-})
-.finally(() => {
-button.disabled = false;
-spinner.style.display = "none";
-});
-}
 
 /* ================= REGISTRATION ================= */
 document.getElementById("registrationForm")
