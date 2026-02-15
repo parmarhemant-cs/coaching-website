@@ -97,8 +97,7 @@ button:disabled { background:#777; }
 <option>JEE</option>
 </select>
 
-<!-- reCAPTCHA -->
-<div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+<div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
 
 <br>
 
@@ -120,7 +119,7 @@ Register
 <input type="email" id="e_email" placeholder="Your Email" required>
 <textarea id="e_message" placeholder="Your Message" required></textarea>
 
-<div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+<div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
 
 <br>
 
@@ -146,7 +145,9 @@ Open Google Sheet
 
 const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 
-function sendData(data, messageElement, formElement, button, spinner) {
+/* ================= COMMON FUNCTION ================= */
+
+function sendData(data, messageElement, formElement, button, spinner, captchaIndex) {
 
   button.disabled = true;
   spinner.style.display = "inline-block";
@@ -170,14 +171,13 @@ function sendData(data, messageElement, formElement, button, spinner) {
       messageElement.classList.add("success");
       messageElement.innerText = "Submitted successfully!";
       formElement.reset();
-      grecaptcha.reset();   // reset captcha
+      grecaptcha.reset(captchaIndex);
     } else {
       messageElement.classList.add("error");
       messageElement.innerText = result;
     }
   })
-  .catch(error => {
-    console.error(error);
+  .catch(() => {
     messageElement.classList.add("error");
     messageElement.innerText = "Server connection error.";
   })
@@ -192,24 +192,34 @@ function sendData(data, messageElement, formElement, button, spinner) {
 
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
+
 e.preventDefault();
+
+const captchaResponse = grecaptcha.getResponse(0);
+
+if (!captchaResponse) {
+  regMsg.className = "message error"; // This is the new one
+  regMsg.innerText = "Please complete reCAPTCHA.";
+  return;
+}
 
 const phonePattern = /^\+?\d{10,15}$/;
 
-if (!phonePattern.test(r_phone.value)) {
-regMsg.classList.add("error");
-regMsg.innerText = "Invalid phone number.";
-return;
+if (!phonePattern.test(r_phone.value.trim())) { // This is the new one
+  regMsg.className = "message error"; // This is the new one
+  regMsg.innerText = "Invalid phone number.";
+  return;
 }
 
 sendData({
-type: "registration",
-name: r_name.value,
-email: r_email.value,
-phone: r_phone.value,
-course: r_course.value,
-"g-recaptcha-response": grecaptcha.getResponse()
-}, regMsg, this, regBtn, regSpinner);
+  type: "registration",
+  name: r_name.value.trim(),
+  email: r_email.value.trim(),
+  phone: r_phone.value.trim(),
+  course: r_course.value,
+  origin: window.location.origin, // This is the new one (required for backend security)
+  "g-recaptcha-response": captchaResponse
+}, regMsg, this, regBtn, regSpinner, 0);
 
 });
 
@@ -218,15 +228,25 @@ course: r_course.value,
 
 document.getElementById("enquiryForm")
 .addEventListener("submit", function(e){
+
 e.preventDefault();
 
+const captchaResponse = grecaptcha.getResponse(1);
+
+if (!captchaResponse) {
+  enqMsg.className = "message error"; // This is the new one
+  enqMsg.innerText = "Please complete reCAPTCHA.";
+  return;
+}
+
 sendData({
-type: "enquiry",
-name: e_name.value,
-email: e_email.value,
-message: e_message.value,
-"g-recaptcha-response": grecaptcha.getResponse()
-}, enqMsg, this, enqBtn, enqSpinner);
+  type: "enquiry",
+  name: e_name.value.trim(),
+  email: e_email.value.trim(),
+  message: e_message.value.trim(),
+  origin: window.location.origin, // This is the new one (required for backend security)
+  "g-recaptcha-response": captchaResponse
+}, enqMsg, this, enqBtn, enqSpinner, 1);
 
 });
 
