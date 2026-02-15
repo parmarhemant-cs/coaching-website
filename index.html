@@ -1,4 +1,4 @@
-v<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -30,14 +30,37 @@ button {
   border:none;
   border-radius:5px;
   cursor:pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 button:hover { background:#004080; }
+button:disabled {
+  background:#777;
+  cursor:not-allowed;
+}
 .message { font-weight:bold; margin-top:10px; }
 .testimonial {
   background:#e9f1ff;
   padding:10px;
   margin:10px 0;
   border-radius:5px;
+}
+
+/* Spinner */
+.spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ccc;
+  border-top: 3px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -82,7 +105,12 @@ button:hover { background:#004080; }
 <option>NEET</option>
 <option>JEE</option>
 </select>
-<button type="submit">Register</button>
+
+<button type="submit" id="regBtn">
+  Register
+  <span class="spinner" id="regSpinner"></span>
+</button>
+
 <div class="message" id="regMsg"></div>
 </form>
 </div>
@@ -93,7 +121,12 @@ button:hover { background:#004080; }
 <input type="text" id="e_name" placeholder="Your Name" required>
 <input type="email" id="e_email" placeholder="Your Email" required>
 <textarea id="e_message" placeholder="Your Message" required></textarea>
-<button type="submit">Send Enquiry</button>
+
+<button type="submit" id="enqBtn">
+  Send Enquiry
+  <span class="spinner" id="enqSpinner"></span>
+</button>
+
 <div class="message" id="enqMsg"></div>
 </form>
 </div>
@@ -104,10 +137,13 @@ button:hover { background:#004080; }
 const scriptURL ="https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 const API_KEY = "MY_SECRET_123";
 
-function sendData(data, messageElement, formElement) {
+function sendData(data, messageElement, formElement, button, spinner) {
+
+  button.disabled = true;
+  spinner.style.display = "inline-block";
+  messageElement.innerText = "Submitting...";
 
   const formData = new URLSearchParams();
-
   for (let key in data) {
     formData.append(key, data[key]);
   }
@@ -125,11 +161,14 @@ function sendData(data, messageElement, formElement) {
   })
   .catch(() => {
     messageElement.innerText = "Server connection error.";
+  })
+  .finally(() => {
+    button.disabled = false;
+    spinner.style.display = "none";
   });
 }
 
-
-
+/* Registration Form */
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
   e.preventDefault();
@@ -147,9 +186,10 @@ document.getElementById("registrationForm")
     email: r_email.value,
     phone: r_phone.value,
     course: r_course.value
-  }, regMsg, this);
+  }, regMsg, this, regBtn, regSpinner);
 });
 
+/* Enquiry Form */
 document.getElementById("enquiryForm")
 .addEventListener("submit", function(e){
   e.preventDefault();
@@ -160,7 +200,7 @@ document.getElementById("enquiryForm")
     name: e_name.value,
     email: e_email.value,
     message: e_message.value
-  }, enqMsg, this);
+  }, enqMsg, this, enqBtn, enqSpinner);
 });
 </script>
 
