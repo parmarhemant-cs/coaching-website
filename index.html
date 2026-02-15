@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Achievers Academy</title>
 
+<!-- Google reCAPTCHA -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f9; }
 header { background:#002147; color:white; padding:20px; text-align:center; }
@@ -41,16 +44,15 @@ button {
 button:hover { background:#004080; }
 button:disabled { background:#777; }
 
-.message { font-weight:bold; margin-top:10px; }
-
-.testimonial {
-  background:#e9f1ff;
-  padding:10px;
-  margin:10px 0;
-  border-radius:5px;
+.message {
+  font-weight:bold;
+  margin-top:10px;
+  min-height:20px;
 }
 
-/* Spinner */
+.success { color:green; }
+.error { color:red; }
+
 .spinner {
   display:none;
   width:18px;
@@ -62,9 +64,7 @@ button:disabled { background:#777; }
   margin-left:10px;
 }
 
-@keyframes spin {
-  to { transform:rotate(360deg); }
-}
+@keyframes spin { to { transform:rotate(360deg); } }
 
 .admin-box {
   background:#fff3cd;
@@ -84,29 +84,9 @@ button:disabled { background:#777; }
 <section>
 
 <div class="card">
-<h2>About Us</h2>
-<p>Expert IITian & Doctor faculty, weekly tests, personal mentoring and result-oriented strategy.</p>
-</div>
-
-<div class="card">
-<h2>Top Results</h2>
-<ul>
-<li>AIR 145 - JEE Advanced</li>
-<li>12 Students scored 690+ in NEET</li>
-<li>95% students cleared JEE Main</li>
-</ul>
-</div>
-
-<div class="card">
-<h2>Testimonials</h2>
-<div class="testimonial">"Best coaching experience!" - Rahul</div>
-<div class="testimonial">"Improved my rank dramatically." - Priya</div>
-</div>
-
-<!-- ================= REGISTRATION ================= -->
-<div class="card">
 <h2>Student Registration</h2>
 <form id="registrationForm">
+
 <input type="text" id="r_name" placeholder="Full Name" required>
 <input type="email" id="r_email" placeholder="Email" required>
 <input type="tel" id="r_phone" placeholder="Phone (10-15 digits)" required>
@@ -117,6 +97,11 @@ button:disabled { background:#777; }
 <option>JEE</option>
 </select>
 
+<!-- reCAPTCHA -->
+<div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+
+<br>
+
 <button type="submit" id="regBtn">
 Register
 <span class="spinner" id="regSpinner"></span>
@@ -126,13 +111,18 @@ Register
 </form>
 </div>
 
-<!-- ================= ENQUIRY ================= -->
+
 <div class="card">
 <h2>Enquiry Form</h2>
 <form id="enquiryForm">
+
 <input type="text" id="e_name" placeholder="Your Name" required>
 <input type="email" id="e_email" placeholder="Your Email" required>
 <textarea id="e_message" placeholder="Your Message" required></textarea>
+
+<div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+
+<br>
 
 <button type="submit" id="enqBtn">
 Send Enquiry
@@ -143,30 +133,24 @@ Send Enquiry
 </form>
 </div>
 
-<!-- ================= ADMIN DASHBOARD ================= -->
 <div class="card admin-box">
 <h2>Admin Dashboard</h2>
-<p>
-📊 View Registrations & Enquiries in your Google Sheet  
-<br><br>
 <a href="https://docs.google.com/spreadsheets" target="_blank">
 Open Google Sheet
 </a>
-</p>
 </div>
 
 </section>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
-const API_KEY = "MY_SECRET_123";
 
-/* ================= SEND DATA FUNCTION ================= */
+const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 
 function sendData(data, messageElement, formElement, button, spinner) {
 
   button.disabled = true;
   spinner.style.display = "inline-block";
+  messageElement.className = "message";
   messageElement.innerText = "Submitting...";
 
   const formData = new URLSearchParams();
@@ -181,14 +165,20 @@ function sendData(data, messageElement, formElement, button, spinner) {
   })
   .then(res => res.text())
   .then(result => {
-    messageElement.innerText = result;
 
-    if (result === "Success") {
+    if (result.trim() === "Success") {
+      messageElement.classList.add("success");
+      messageElement.innerText = "Submitted successfully!";
       formElement.reset();
+      grecaptcha.reset();   // reset captcha
+    } else {
+      messageElement.classList.add("error");
+      messageElement.innerText = result;
     }
   })
   .catch(error => {
     console.error(error);
+    messageElement.classList.add("error");
     messageElement.innerText = "Server connection error.";
   })
   .finally(() => {
@@ -199,39 +189,47 @@ function sendData(data, messageElement, formElement, button, spinner) {
 
 
 /* ================= REGISTRATION ================= */
+
 document.getElementById("registrationForm")
 .addEventListener("submit", function(e){
 e.preventDefault();
 
 const phonePattern = /^\+?\d{10,15}$/;
+
 if (!phonePattern.test(r_phone.value)) {
+regMsg.classList.add("error");
 regMsg.innerText = "Invalid phone number.";
 return;
 }
 
 sendData({
-apiKey: API_KEY,
 type: "registration",
 name: r_name.value,
 email: r_email.value,
 phone: r_phone.value,
-course: r_course.value
+course: r_course.value,
+"g-recaptcha-response": grecaptcha.getResponse()
 }, regMsg, this, regBtn, regSpinner);
+
 });
 
+
 /* ================= ENQUIRY ================= */
+
 document.getElementById("enquiryForm")
 .addEventListener("submit", function(e){
 e.preventDefault();
 
 sendData({
-apiKey: API_KEY,
 type: "enquiry",
 name: e_name.value,
 email: e_email.value,
-message: e_message.value
+message: e_message.value,
+"g-recaptcha-response": grecaptcha.getResponse()
 }, enqMsg, this, enqBtn, enqSpinner);
+
 });
+
 </script>
 
 </body>
