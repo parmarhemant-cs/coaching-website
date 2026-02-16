@@ -1,255 +1,156 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Achievers Academy</title>
+  <meta charset="UTF-8">
+  <title>Coaching Registration</title>
 
-<!-- Google reCAPTCHA -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <!-- ============================= -->
+  <!-- Google reCAPTCHA v2 Script    -->
+  <!-- This loads captcha validation -->
+  <!-- ============================= -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-<style>
-body { font-family: Arial; margin:0; background:#f4f6f9; }
-header { background:#002147; color:white; padding:20px; text-align:center; }
-section { padding:40px; max-width:900px; margin:auto; }
-
-.card {
-  background:white;
-  padding:20px;
-  margin-bottom:20px;
-  border-radius:8px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-input, select, textarea {
-  width:100%;
-  padding:10px;
-  margin:8px 0 15px;
-  border-radius:5px;
-  border:1px solid #ccc;
-}
-
-button {
-  background:#002147;
-  color:white;
-  padding:10px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-button:hover { background:#004080; }
-button:disabled { background:#777; }
-
-.message {
-  font-weight:bold;
-  margin-top:10px;
-  min-height:20px;
-}
-
-.success { color:green; }
-.error { color:red; }
-
-.spinner {
-  display:none;
-  width:18px;
-  height:18px;
-  border:3px solid #ccc;
-  border-top:3px solid #ffffff;
-  border-radius:50%;
-  animation:spin 0.8s linear infinite;
-  margin-left:10px;
-}
-
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.admin-box {
-  background:#fff3cd;
-  padding:15px;
-  border-radius:5px;
-}
-</style>
+  <style>
+    body { font-family: Arial; max-width: 500px; margin: 40px auto; }
+    input, select, button { width: 100%; padding: 10px; margin: 8px 0; }
+    button { background: #2c7be5; color: white; border: none; cursor: pointer; }
+    button:disabled { background: gray; }
+    .hidden { display:none; }
+  </style>
 </head>
 
 <body>
 
-<header>
-<h1>Achievers Academy</h1>
-<p>NEET & JEE Coaching Excellence</p>
-</header>
+<h2>Course Registration</h2>
 
-<section>
+<form id="regForm">
 
-<div class="card">
-<h2>Student Registration</h2>
-<form id="registrationForm">
+  <!-- Name -->
+  <input type="text" name="name" placeholder="Full Name" required>
 
-<input type="text" id="r_name" placeholder="Full Name" required>
-<input type="email" id="r_email" placeholder="Email" required>
-<input type="tel" id="r_phone" placeholder="Phone (10-15 digits)" required>
+  <!-- Email -->
+  <input type="email" name="email" placeholder="Email" required>
 
-<select id="r_course" required>
-<option value="">Select Course</option>
-<option>NEET</option>
-<option>JEE</option>
-</select>
+  <!-- Phone -->
+  <input type="tel" name="phone" placeholder="Phone Number" required>
 
-<div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
+  <!-- Course Dropdown -->
+  <select name="course" required>
+    <option value="">Select Course</option>
+    <option value="JEE">JEE</option>
+    <option value="NEET">NEET</option>
+  </select>
 
-<br>
+  <!-- ===================================== -->
+  <!-- Honeypot Field (Spam Trap)            -->
+  <!-- Bots fill this automatically          -->
+  <!-- Real users never see this field       -->
+  <!-- ===================================== -->
+  <input type="text" name="website" class="hidden">
 
-<button type="submit" id="regBtn">
-Register
-<span class="spinner" id="regSpinner"></span>
-</button>
+  <!-- ============================= -->
+  <!-- Google reCAPTCHA Checkbox     -->
+  <!-- Replace YOUR_SITE_KEY         -->
+  <!-- ============================= -->
+  <div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
 
-<div class="message" id="regMsg"></div>
+  <button type="submit" id="submitBtn">Submit</button>
+
 </form>
-</div>
 
-
-<div class="card">
-<h2>Enquiry Form</h2>
-<form id="enquiryForm">
-
-<input type="text" id="e_name" placeholder="Your Name" required>
-<input type="email" id="e_email" placeholder="Your Email" required>
-<textarea id="e_message" placeholder="Your Message" required></textarea>
-
-<div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
-
-<br>
-
-<button type="submit" id="enqBtn">
-Send Enquiry
-<span class="spinner" id="enqSpinner"></span>
-</button>
-
-<div class="message" id="enqMsg"></div>
-</form>
-</div>
-
-<div class="card admin-box">
-<h2>Admin Dashboard</h2>
-<a href="https://docs.google.com/spreadsheets" target="_blank">
-Open Google Sheet
-</a>
-</div>
-
-</section>
+<p id="status"></p>
 
 <script>
+/* =====================================================
+   CONFIGURATION SECTION
+   ===================================================== */
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
+/* Replace this with your latest deployed Apps Script URL */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 
-/* ================= COMMON FUNCTION ================= */
+/* Rate limiting: 1 submission every 30 seconds */
+const SUBMIT_DELAY = 30000;
 
-function sendData(data, messageElement, formElement, button, spinner, captchaIndex) {
 
-  button.disabled = true;
-  spinner.style.display = "inline-block";
-  messageElement.className = "message";
-  messageElement.innerText = "Submitting...";
+/* =====================================================
+   FORM SUBMISSION HANDLER
+   ===================================================== */
 
-  const formData = new URLSearchParams();
+const form = document.getElementById("regForm");
+const status = document.getElementById("status");
+const button = document.getElementById("submitBtn");
 
-  for (let key in data) {
-    formData.append(key, data[key]);
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  /* ============================= */
+  /* Honeypot Spam Protection      */
+  /* If hidden field is filled     */
+  /* it's a bot → block submission */
+  /* ============================= */
+  if (form.website.value !== "") {
+    status.innerText = "Spam detected.";
+    return;
   }
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.text())
-  .then(result => {
+  /* ============================= */
+  /* Rate Limiting Protection      */
+  /* Prevent rapid repeat submits  */
+  /* ============================= */
+  const lastSubmit = localStorage.getItem("lastSubmit");
+  if (lastSubmit && (Date.now() - lastSubmit < SUBMIT_DELAY)) {
+    status.innerText = "Please wait before submitting again.";
+    return;
+  }
 
-    if (result.trim() === "Success") {
-      messageElement.classList.add("success");
-      messageElement.innerText = "Submitted successfully!";
-      formElement.reset();
-      grecaptcha.reset(captchaIndex);
-    } else {
-      messageElement.classList.add("error");
-      messageElement.innerText = result;
-    }
-  })
-  .catch(() => {
-    messageElement.classList.add("error");
-    messageElement.innerText = "Server connection error.";
-  })
-  .finally(() => {
-    button.disabled = false;
-    spinner.style.display = "none";
-  });
-}
+  /* ============================= */
+  /* reCAPTCHA Validation          */
+  /* Ensure user checked captcha   */
+  /* ============================= */
+  const captchaToken = grecaptcha.getResponse();
+  if (!captchaToken) {
+    status.innerText = "Please verify you are not a robot.";
+    return;
+  }
 
+  button.disabled = true;
+  status.innerText = "Submitting...";
 
-/* ================= REGISTRATION ================= */
+  const formData = new FormData(form);
+  formData.append("g-recaptcha-response", captchaToken);
 
-document.getElementById("registrationForm")
-.addEventListener("submit", function(e){
+  try {
 
-e.preventDefault();
+    /* ============================= */
+    /* Send Data to Google Apps     */
+    /* Backend handles:             */
+    /* - recaptcha verification     */
+    /* - sheet writing              */
+    /* - email sending              */
+    /* - SMS sending (optional)     */
+    /* ============================= */
 
-const captchaResponse = grecaptcha.getResponse(0);
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: formData
+    });
 
-if (!captchaResponse) {
-  regMsg.className = "message error"; // This is the new one
-  regMsg.innerText = "Please complete reCAPTCHA.";
-  return;
-}
+    const result = await response.text();
 
-const phonePattern = /^\+?\d{10,15}$/;
+    status.innerText = result;
 
-if (!phonePattern.test(r_phone.value.trim())) { // This is the new one
-  regMsg.className = "message error"; // This is the new one
-  regMsg.innerText = "Invalid phone number.";
-  return;
-}
+    /* Save submission time for rate limit */
+    localStorage.setItem("lastSubmit", Date.now());
 
-sendData({
-  type: "registration",
-  name: r_name.value.trim(),
-  email: r_email.value.trim(),
-  phone: r_phone.value.trim(),
-  course: r_course.value,
-  origin: window.location.origin, // This is the new one (required for backend security)
-  "g-recaptcha-response": captchaResponse
-}, regMsg, this, regBtn, regSpinner, 0);
+    form.reset();
+    grecaptcha.reset();
 
+  } catch (error) {
+    status.innerText = "Server connection error.";
+  }
+
+  button.disabled = false;
 });
-
-
-/* ================= ENQUIRY ================= */
-
-document.getElementById("enquiryForm")
-.addEventListener("submit", function(e){
-
-e.preventDefault();
-
-const captchaResponse = grecaptcha.getResponse(1);
-
-if (!captchaResponse) {
-  enqMsg.className = "message error"; // This is the new one
-  enqMsg.innerText = "Please complete reCAPTCHA.";
-  return;
-}
-
-sendData({
-  type: "enquiry",
-  name: e_name.value.trim(),
-  email: e_email.value.trim(),
-  message: e_message.value.trim(),
-  origin: window.location.origin, // This is the new one (required for backend security)
-  "g-recaptcha-response": captchaResponse
-}, enqMsg, this, enqBtn, enqSpinner, 1);
-
-});
-
 </script>
 
 </body>
