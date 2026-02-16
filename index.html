@@ -1,158 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Coaching Registration</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huge Success Institute</title>
 
-  <!-- ============================= -->
-  <!-- Google reCAPTCHA v2 Script    -->
-  <!-- This loads captcha validation -->
-  <!-- ============================= -->
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    body { font-family: Arial; max-width: 500px; margin: 40px auto; }
-    input, select, button { width: 100%; padding: 10px; margin: 8px 0; }
-    button { background: #2c7be5; color: white; border: none; cursor: pointer; }
-    button:disabled { background: gray; }
-    .hidden { display:none; }
-  </style>
+<!-- reCAPTCHA Script -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{background:#f4f6fb;color:#333;line-height:1.6;}
+
+header{
+  background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+  url('https://images.unsplash.com/photo-1523580494863-6f3031224c94');
+  background-size:cover;
+  background-position:center;
+  color:white;
+  text-align:center;
+  padding:120px 20px;
+}
+
+header h1{font-size:48px;margin-bottom:20px;}
+header p{font-size:20px;margin-bottom:30px;}
+
+.btn{
+  display:inline-block;
+  padding:12px 28px;
+  background:#ffcc00;
+  color:#000;
+  border-radius:30px;
+  text-decoration:none;
+  font-weight:600;
+  margin:5px;
+  transition:0.3s;
+}
+.btn:hover{background:#ffaa00;}
+
+section{padding:70px 20px;max-width:1100px;margin:auto;}
+.section-title{text-align:center;font-size:32px;margin-bottom:40px;color:#1e3c72;}
+
+.courses,.testimonials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:25px;
+}
+
+.card,.testimonial{
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  transition:0.3s;
+}
+.card:hover{transform:translateY(-8px);}
+
+.card h3{margin-bottom:15px;color:#2a5298;}
+
+.testimonial p{margin-bottom:10px;}
+
+form{
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  max-width:600px;
+  margin:auto;
+}
+
+form input,form textarea,form select{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+form button{
+  width:100%;
+  padding:12px;
+  border:none;
+  background:#2a5298;
+  color:white;
+  font-weight:600;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.3s;
+}
+form button:hover{background:#1e3c72;}
+
+.contact{text-align:center;}
+
+footer{
+  background:#1e3c72;
+  color:white;
+  text-align:center;
+  padding:20px;
+  margin-top:40px;
+}
+
+@media(max-width:768px){
+  header h1{font-size:32px;}
+}
+</style>
 </head>
 
 <body>
 
-<h2>Course Registration</h2>
+<!-- HERO -->
+<header>
+  <h1>Huge Success Institute</h1>
+  <p>Achieve Top Ranks in JEE & NEET with Expert Guidance</p>
+  <a href="#courses" class="btn">Explore Courses</a>
+  <a href="#enquiry" class="btn">Enquire Now</a>
+</header>
 
-<form id="regForm">
+<!-- ABOUT -->
+<section>
+  <h2 class="section-title">About Us</h2>
+  <p style="text-align:center;max-width:800px;margin:auto;">
+    Huge Success Institute provides structured preparation programs
+    for JEE & NEET aspirants with expert faculty, weekly tests,
+    personal mentoring and performance tracking.
+  </p>
+</section>
 
-  <!-- Name -->
-  <input type="text" name="name" placeholder="Full Name" required>
+<!-- COURSES -->
+<section id="courses">
+  <h2 class="section-title">Our Courses</h2>
+  <div class="courses">
+    <div class="card">
+      <h3>NEET Classroom Program</h3>
+      <p>Complete PCB preparation with weekly mock tests and mentoring support.</p>
+    </div>
+    <div class="card">
+      <h3>JEE Main + Advanced</h3>
+      <p>Strong concept building, advanced problem solving and strategy sessions.</p>
+    </div>
+    <div class="card">
+      <h3>Crash Course</h3>
+      <p>Short-term intensive revision program for final exam preparation.</p>
+    </div>
+  </div>
+</section>
 
-  <!-- Email -->
-  <input type="email" name="email" placeholder="Email" required>
+<!-- ENQUIRY FORM -->
+<section id="enquiry">
+  <h2 class="section-title">Enquiry Form</h2>
 
-  <!-- Phone -->
-  <input type="tel" name="phone" placeholder="Phone Number" required>
+  <form id="enquiryForm">
 
-  <!-- Course Dropdown -->
-  <select name="course" required>
-    <option value="">Select Course</option>
-    <option value="JEE">JEE</option>
-    <option value="NEET">NEET</option>
-  </select>
+    <input type="text" name="name" placeholder="Full Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="tel" name="phone" placeholder="Phone Number" required>
 
-  <!-- ===================================== -->
-  <!-- Honeypot Field (Spam Trap)            -->
-  <!-- Bots fill this automatically          -->
-  <!-- Real users never see this field       -->
-  <!-- ===================================== -->
-  <input type="text" name="website" class="hidden">
+    <select name="course" required>
+      <option value="">Select Course</option>
+      <option value="JEE">JEE</option>
+      <option value="NEET">NEET</option>
+      <option value="Crash Course">Crash Course</option>
+    </select>
 
-  <!-- ============================= -->
-  <!-- Google reCAPTCHA Checkbox     -->
-  <!-- Replace YOUR_SITE_KEY         -->
-  <!-- ============================= -->
-  <div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
+    <textarea name="message" placeholder="Your Message"></textarea>
 
-  <button type="submit" id="submitBtn">Submit</button>
+    <!-- Honeypot Spam Protection -->
+    <input type="text" name="website" style="display:none;">
 
-</form>
+    <!-- reCAPTCHA -->
+    <div class="g-recaptcha" data-sitekey="6LeqWWwsAAAAAN7VMg1QxuIGOFgGsyJbknVIjvq8"></div>
 
-<p id="status"></p>
+    <button type="submit">Submit Enquiry</button>
+  </form>
+</section>
 
+<!-- TESTIMONIALS -->
+<section>
+  <h2 class="section-title">Student Testimonials</h2>
+  <div class="testimonials">
+    <div class="testimonial">
+      <p>"I scored 680 in NEET thanks to structured mentoring."</p>
+      <strong>- Aarav S.</strong>
+    </div>
+    <div class="testimonial">
+      <p>"My JEE rank improved drastically within months."</p>
+      <strong>- Meera R.</strong>
+    </div>
+    <div class="testimonial">
+      <p>"Best institute for serious aspirants."</p>
+      <strong>- Sahil T.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact">
+  <h2 class="section-title">Contact Us</h2>
+  <p><strong>Phone:</strong> +91 98765 43210</p>
+  <p><strong>Email:</strong> contact@hugesuccess.in</p>
+  <p><strong>Address:</strong> 123 Learning Street, Your City, India</p>
+</section>
+
+<footer>
+  © 2026 Huge Success Institute | All Rights Reserved
+</footer>
+
+<!-- SECURE FORM SUBMISSION SCRIPT -->
 <script>
-/* =====================================================
-   CONFIGURATION SECTION
-   ===================================================== */
-
-/* Replace this with your latest deployed Apps Script URL */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 
-/* Rate limiting: 1 submission every 30 seconds */
-const SUBMIT_DELAY = 30000;
-
-
-/* =====================================================
-   FORM SUBMISSION HANDLER
-   ===================================================== */
-
-const form = document.getElementById("regForm");
-const status = document.getElementById("status");
-const button = document.getElementById("submitBtn");
-
-form.addEventListener("submit", async function(e) {
+document.getElementById("enquiryForm").addEventListener("submit", async function(e){
   e.preventDefault();
 
-  /* ============================= */
-  /* Honeypot Spam Protection      */
-  /* If hidden field is filled     */
-  /* it's a bot → block submission */
-  /* ============================= */
-  if (form.website.value !== "") {
-    status.innerText = "Spam detected.";
-    return;
-  }
-
-  /* ============================= */
-  /* Rate Limiting Protection      */
-  /* Prevent rapid repeat submits  */
-  /* ============================= */
-  const lastSubmit = localStorage.getItem("lastSubmit");
-  if (lastSubmit && (Date.now() - lastSubmit < SUBMIT_DELAY)) {
-    status.innerText = "Please wait before submitting again.";
-    return;
-  }
-
-  /* ============================= */
-  /* reCAPTCHA Validation          */
-  /* Ensure user checked captcha   */
-  /* ============================= */
-  const captchaToken = grecaptcha.getResponse();
-  if (!captchaToken) {
-    status.innerText = "Please verify you are not a robot.";
-    return;
-  }
-
-  button.disabled = true;
-  status.innerText = "Submitting...";
-
-  const formData = new FormData(form);
-  formData.append("g-recaptcha-response", captchaToken);
-
-  try {
-
-    /* ============================= */
-    /* Send Data to Google Apps     */
-    /* Backend handles:             */
-    /* - recaptcha verification     */
-    /* - sheet writing              */
-    /* - email sending              */
-    /* - SMS sending (optional)     */
-    /* ============================= */
-
-    const response = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: formData
-    });
-
-    const result = await response.text();
-
-    status.innerText = result;
-
-    /* Save submission time for rate limit */
-    localStorage.setItem("lastSubmit", Date.now());
-
-    form.reset();
-    grecaptcha.reset();
-
-  } catch (error) {
-    status.innerText = "Server connection error.";
-  }
-
-  button.disabled = false;
-});
-</script>
-
-</body>
-</html>
+  const captcha =
 
