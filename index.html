@@ -210,11 +210,91 @@ footer{
 </footer>
 
 <!-- SECURE FORM SUBMISSION SCRIPT -->
+<!-- SECURE FORM SUBMISSION SCRIPT -->
 <script>
+/* =========================================
+   Google Apps Script Web App URL
+   This connects form to Google Sheet backend
+   ========================================= */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw07XODIxC5KJ5d8JizDR4zobJqZRfId4N3CGkf6XF_Q5eWACwDD1eOyCD9aOu3WoXaGA/exec";
 
-document.getElementById("enquiryForm").addEventListener("submit", async function(e){
+/* =========================================
+   Rate Limiting (1 submission per 30 sec)
+   This prevents spam repeat submissions
+   ========================================= */
+const SUBMIT_DELAY = 30000;
+
+const form = document.getElementById("enquiryForm");
+
+/* =========================================
+   Form Submit Event Listener
+   ========================================= */
+form.addEventListener("submit", async function(e){
   e.preventDefault();
 
-  const captcha =
+  /* ============================= */
+  /* Honeypot Spam Protection      */
+  /* If hidden field is filled     */
+  /* it means bot → block it       */
+  /* ============================= */
+  if (form.website.value !== "") {
+    alert("Spam detected.");
+    return;
+  }
+
+  /* ============================= */
+  /* Rate Limiting Check           */
+  /* Prevent fast repeat submits   */
+  /* ============================= */
+  const lastSubmit = localStorage.getItem("lastSubmit");
+  if (lastSubmit && (Date.now() - lastSubmit < SUBMIT_DELAY)) {
+    alert("Please wait before submitting again.");
+    return;
+  }
+
+  /* ============================= */
+  /* reCAPTCHA Validation          */
+  /* Ensure checkbox is checked    */
+  /* ============================= */
+  const captchaToken = grecaptcha.getResponse();
+  if (!captchaToken) {
+    alert("Please verify you are not a robot.");
+    return;
+  }
+
+  const formData = new FormData(form);
+
+  /* Append reCAPTCHA token */
+  formData.append("g-recaptcha-response", captchaToken);
+
+  try {
+
+    /* ============================= */
+    /* Send Data to Apps Script      */
+    /* Backend handles:              */
+    /* - reCAPTCHA verification      */
+    /* - Sheet entry                 */
+    /* - Email/SMS (if enabled)      */
+    /* ============================= */
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.text();
+
+    alert(result);
+
+    /* Save submission time */
+    localStorage.setItem("lastSubmit", Date.now());
+
+    form.reset();
+    grecaptcha.reset();
+
+  } catch (error) {
+    alert("Server connection error.");
+  }
+
+});
+</script>
 
